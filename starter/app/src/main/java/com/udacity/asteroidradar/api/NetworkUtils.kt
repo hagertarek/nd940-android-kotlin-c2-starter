@@ -1,16 +1,27 @@
 package com.udacity.asteroidradar.api
 
-import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
+import com.udacity.asteroidradar.database.DatabaseAsteroid
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-fun parseAsteroidsJsonResult(jsonResult: JSONObject): ArrayList<Asteroid> {
+data class NetworkAsteroid(
+    val id: Long,
+    val codename: String,
+    val closeApproachDate: String,
+    val absoluteMagnitude: Double,
+    val estimatedDiameter: Double,
+    val relativeVelocity: Double,
+    val distanceFromEarth: Double,
+    val isPotentiallyHazardous: Boolean
+)
+
+fun parseAsteroidsJsonResult(jsonResult: JSONObject): ArrayList<NetworkAsteroid> {
     val nearEarthObjectsJson = jsonResult.getJSONObject("near_earth_objects")
 
-    val asteroidList = ArrayList<Asteroid>()
+    val asteroidList = ArrayList<NetworkAsteroid>()
 
     val nextSevenDaysFormattedDates = getNextSevenDaysFormattedDates()
     for (formattedDate in nextSevenDaysFormattedDates) {
@@ -34,14 +45,32 @@ fun parseAsteroidsJsonResult(jsonResult: JSONObject): ArrayList<Asteroid> {
                 val isPotentiallyHazardous = asteroidJson
                     .getBoolean("is_potentially_hazardous_asteroid")
 
-                val asteroid = Asteroid(id, codename, formattedDate, absoluteMagnitude,
-                    estimatedDiameter, relativeVelocity, distanceFromEarth, isPotentiallyHazardous)
+                val asteroid = NetworkAsteroid(
+                    id, codename, formattedDate, absoluteMagnitude,
+                    estimatedDiameter, relativeVelocity, distanceFromEarth, isPotentiallyHazardous
+                )
                 asteroidList.add(asteroid)
             }
         }
     }
 
+
     return asteroidList
+}
+
+fun ArrayList<NetworkAsteroid>.asDatabaseModel(): Array<DatabaseAsteroid> {
+    return map {
+        DatabaseAsteroid(
+            id = it.id,
+            codename = it.codename,
+            closeApproachDate = it.closeApproachDate,
+            absoluteMagnitude = it.absoluteMagnitude,
+            estimatedDiameter = it.estimatedDiameter,
+            relativeVelocity = it.relativeVelocity,
+            distanceFromEarth = it.distanceFromEarth,
+            isPotentiallyHazardous = it.isPotentiallyHazardous
+        )
+    }.toTypedArray()
 }
 
 private fun getNextSevenDaysFormattedDates(): ArrayList<String> {
@@ -57,3 +86,6 @@ private fun getNextSevenDaysFormattedDates(): ArrayList<String> {
 
     return formattedDateList
 }
+
+val startDate = getNextSevenDaysFormattedDates()[0]
+val endDate = getNextSevenDaysFormattedDates().last()
