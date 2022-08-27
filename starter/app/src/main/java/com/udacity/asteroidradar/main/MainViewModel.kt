@@ -4,18 +4,18 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.database.getDatabase
 import com.udacity.asteroidradar.repository.AsteroidRepository
-import com.udacity.asteroidradar.repository.Asteroidfilter
+import com.udacity.asteroidradar.repository.AsteroidFilter
 import kotlinx.coroutines.launch
 
 class MainViewModel(app: Application) : ViewModel() {
 
     private val database = getDatabase(app)
     private val asteroidRepository = AsteroidRepository(database)
-    private val filter = MutableLiveData(Asteroidfilter.SAVED)
+    private val filter = MutableLiveData(AsteroidFilter.SAVED)
     var asteroidsList = filter.map {
         when (it) {
-            Asteroidfilter.TODAY -> asteroidRepository.todayAsteroids
-            Asteroidfilter.WEEK -> asteroidRepository.weekAsteroids
+            AsteroidFilter.TODAY -> asteroidRepository.todayAsteroids
+            AsteroidFilter.WEEK -> asteroidRepository.weekAsteroids
             else -> asteroidRepository.asteroids
         }
     }
@@ -34,7 +34,7 @@ class MainViewModel(app: Application) : ViewModel() {
         }
     }
 
-    fun updateFilter(filter: Asteroidfilter) {
+    fun updateFilter(filter: AsteroidFilter) {
         this.filter.value = filter
     }
 

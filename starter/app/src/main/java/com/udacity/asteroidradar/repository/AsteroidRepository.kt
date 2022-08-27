@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-enum class Asteroidfilter { SAVED, TODAY, WEEK }
+enum class AsteroidFilter { SAVED, TODAY, WEEK }
 
 class AsteroidRepository(private val database: AsteroidDatabase) {
 

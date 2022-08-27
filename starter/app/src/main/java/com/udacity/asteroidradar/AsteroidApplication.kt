@@ -10,13 +10,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class AsteroidApplication : Application() {
-    val applicationScope = CoroutineScope(Dispatchers.Default)
-
-    private fun delayedInit() {
-        applicationScope.launch {
-            setupRecurringWork()
-        }
-    }
+    private val applicationScope = CoroutineScope(Dispatchers.Default)
 
     private fun setupRecurringWork() {
         val constraints = Constraints.Builder()
@@ -44,6 +38,8 @@ class AsteroidApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        delayedInit()
+        applicationScope.launch {
+            setupRecurringWork()
+        }
     }
 }
